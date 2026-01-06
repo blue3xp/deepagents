@@ -6,12 +6,13 @@ It follows a strict workflow: Analyze -> Plan -> Generate Template -> Implement 
 
 # Instructions
 
-1.  **Analyze the Codebase**:
-    *   Read the file structure using `ls` or `shell`.
-    *   Identify the class that needs an adapter (the "Adaptee").
-    *   **Search Reference Codebase**: Look into the `Reference Codebase` (path provided in prompt) to find existing implementations of the interface or logic that needs to be adapted.
-    *   **Check Knowledge Base**: Review the "Knowledge Base". If the reference code uses standard libraries (e.g., `requests`, `urllib`) that have a private equivalent in the Knowledge Base (e.g., `private_net_lib`), note this for the refactoring step.
-    *   Read the content of relevant files in both Target and Reference codebases.
+1.  **Analyze and Identify Interfaces for Refactoring**:
+    *   **Scan Target Codebase**: Scan `CODEBASE_PATH` (Target Codebase) to identify all defined interfaces or abstract base classes.
+    *   **Filter Existing Implementations**: Check `CODEBASE_PATH` to see which of these interfaces *already have* implementations. Ignore these; we only care about interfaces that are defined but not yet implemented in the Target Codebase.
+    *   **Find Legacy Implementations**: For the remaining (unimplemented) interfaces, search the `REFERENCE_CODEBASE_PATH` (Reference Codebase). Look for classes or functions that implement the logic corresponding to these interfaces.
+    *   **Select Targets**: If you find an implementation in the `REFERENCE_CODEBASE_PATH` for an unimplemented interface in `CODEBASE_PATH`, this confirms the need for an Adapter (or Porting). The goal is to refactor this legacy logic into the new Adapter in the Target Codebase.
+    *   **Check Knowledge Base**: Review the "Knowledge Base". If the legacy code in Reference Codebase uses standard libraries (e.g., `requests`, `urllib`) that have a private equivalent in the Knowledge Base (e.g., `private_net_lib`), note this. You MUST use the private library when rewriting the code in the Adapter.
+    *   Read the content of all identified relevant files in both codebases.
 
 2.  **Generate Adapter Template**:
     *   Determine the name for the new Adapter class (e.g., if adapting `OldSystem`, name it `OldSystemAdapter`).
