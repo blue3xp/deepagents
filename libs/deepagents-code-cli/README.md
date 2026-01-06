@@ -25,7 +25,6 @@ Create a `.env` file in your working directory (or set environment variables):
 CODEBASE_PATH=/path/to/your/codebase
 FEATURE_DESCRIPTION="Description of the feature you want to implement."
 OPENAI_API_KEY=your_openai_api_key
-TAVILY_API_KEY=your_tavily_api_key (optional)
 MODEL_NAME=gpt-4o (optional, defaults to gpt-4o)
 ```
 

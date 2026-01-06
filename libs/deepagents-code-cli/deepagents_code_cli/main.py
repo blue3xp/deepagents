@@ -6,7 +6,7 @@ from deepagents_cli.agent import create_cli_agent
 from deepagents_cli.config import SessionState, create_model
 from deepagents_cli.execution import execute_task
 from deepagents_cli.ui import TokenTracker
-from deepagents_cli.tools import fetch_url, http_request, web_search
+from deepagents_cli.tools import fetch_url, http_request
 
 from deepagents_code_cli.config import config
 

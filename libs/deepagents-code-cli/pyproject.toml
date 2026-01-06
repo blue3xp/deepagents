@@ -11,7 +11,6 @@ dependencies = [
   "rich>=13.0.0",
   "prompt-toolkit>=3.0.52",
   "langchain-openai>=0.1.0",
-  "tavily-python",
   "python-dotenv",
   "markdownify>=0.13.0",
   "langchain>=1.0.7",

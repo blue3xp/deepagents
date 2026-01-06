@@ -9,7 +9,6 @@ class Config:
         self.codebase_path = os.getenv("CODEBASE_PATH")
         self.feature_description = os.getenv("FEATURE_DESCRIPTION")
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
-        self.tavily_api_key = os.getenv("TAVILY_API_KEY")
         self.model_name = os.getenv("MODEL_NAME", "gpt-4o")
 
     def validate(self):
