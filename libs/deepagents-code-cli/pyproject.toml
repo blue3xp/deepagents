@@ -1,0 +1,44 @@
+[project]
+name = "deepagents-code-cli"
+version = "0.0.1"
+description = "Deepagents Code CLI for autonomous feature implementation"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11,<4.0"
+dependencies = [
+  "deepagents==0.2.8",
+  "deepagents-cli==0.0.12",
+  "rich>=13.0.0",
+  "prompt-toolkit>=3.0.52",
+  "langchain-openai>=0.1.0",
+  "tavily-python",
+  "python-dotenv",
+  "markdownify>=0.13.0",
+  "langchain>=1.0.7",
+  "pillow>=10.0.0",
+  "pyyaml>=6.0",
+]
+
+[project.scripts]
+deepagents-code-cli = "deepagents_code_cli.main:main"
+
+[dependency-groups]
+test = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.3",
+    "pytest-cov>=6.0.0",
+    "pytest-mock>=3.14.0",
+    "responses>=0.25.0",
+    "ruff>=0.9.7",
+]
+
+[build-system]
+requires = ["setuptools>=73.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+deepagents_code_cli = ["skills/*.md", "skills/*.py"]
+
+[tool.uv.sources]
+deepagents = { path = "../deepagents" }
+deepagents-cli = { path = "../deepagents-cli" }
