@@ -9,8 +9,9 @@ It follows a strict workflow: Analyze -> Plan -> Generate Template -> Implement 
 1.  **Analyze the Codebase**:
     *   Read the file structure using `ls` or `shell`.
     *   Identify the class that needs an adapter (the "Adaptee").
-    *   **Check Knowledge Base**: Before planning, review the "Knowledge Base" section in your system prompt. If there are private libraries (e.g., `private_net_lib`) that the adapter should utilize or interface with, note them down.
-    *   Read the content of relevant files to understand existing logic using `read_file`.
+    *   **Search Reference Codebase**: Look into the `Reference Codebase` (path provided in prompt) to find existing implementations of the interface or logic that needs to be adapted.
+    *   **Check Knowledge Base**: Review the "Knowledge Base". If the reference code uses standard libraries (e.g., `requests`, `urllib`) that have a private equivalent in the Knowledge Base (e.g., `private_net_lib`), note this for the refactoring step.
+    *   Read the content of relevant files in both Target and Reference codebases.
 
 2.  **Generate Adapter Template**:
     *   Determine the name for the new Adapter class (e.g., if adapting `OldSystem`, name it `OldSystemAdapter`).
@@ -18,10 +19,14 @@ It follows a strict workflow: Analyze -> Plan -> Generate Template -> Implement 
         `python {Skills Directory}/adapter_helper.py <AdapterName>`
     *   The output of this command is your starting point.
 
-3.  **Implement Code**:
+3.  **Refactor & Implement Code**:
     *   Create the new adapter file using the generated template.
-    *   Implement the specific logic to adapt the interface.
-    *   Ensure code follows existing style.
+    *   **Refactor Logic**:
+        *   Extract the business logic from the `Reference Codebase`.
+        *   **Apply Knowledge**: If the reference code uses external libraries, check if a private library from the "Knowledge Base" should be used instead.
+        *   **Rewrite**: Implement the logic in the Adapter, replacing external calls with private library calls where applicable.
+        *   If no private library applies, migrate the logic directly while maintaining behavior.
+    *   Ensure the code follows the Target Codebase style.
 
 4.  **Implement Tests**:
     *   Create a new test file or add to existing tests.

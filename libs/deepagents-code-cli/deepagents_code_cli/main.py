@@ -18,6 +18,7 @@ async def run_autonomous_loop():
         sys.exit(1)
 
     print(f"Codebase Path: {config.codebase_path}")
+    print(f"Reference Codebase Path: {config.reference_codebase_path}")
 
     # Create model
     model = create_model(config.model_name)
@@ -73,6 +74,7 @@ async def run_autonomous_loop():
 You are an autonomous coding agent specialized in implementing Adapter patterns.
 
 Target Codebase: {config.codebase_path}
+Reference Codebase: {config.reference_codebase_path}
 Skills Directory: {package_skills_dir}
 
 ## Knowledge Base

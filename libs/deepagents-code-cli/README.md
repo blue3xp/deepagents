@@ -23,6 +23,7 @@ Create a `.env` file in your working directory (or set environment variables):
 
 ```env
 CODEBASE_PATH=/path/to/your/codebase
+REFERENCE_CODEBASE_PATH=/path/to/reference/codebase
 OPENAI_API_KEY=your_openai_api_key
 MODEL_NAME=gpt-4o (optional, defaults to gpt-4o)
 ```
@@ -33,7 +34,11 @@ MODEL_NAME=gpt-4o (optional, defaults to gpt-4o)
 deepagents-code-cli
 ```
 
-The agent will analyze the code in `CODEBASE_PATH` to identify where an Adapter pattern is needed. It will generate an adapter template using a helper script, implement the adapter, and verify it with tests.
+The agent will:
+1.  Analyze `CODEBASE_PATH` and `REFERENCE_CODEBASE_PATH`.
+2.  Generate an adapter template using a helper script.
+3.  Refactor logic from the reference codebase into the new adapter, applying patterns from the internal "Knowledge Base" (e.g., using private libraries).
+4.  Verify the implementation with tests.
 
 ## Development
 
