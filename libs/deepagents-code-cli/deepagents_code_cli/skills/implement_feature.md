@@ -6,9 +6,10 @@ It follows a strict workflow: Analyze -> Plan -> Implement -> Test -> Verify.
 
 # Instructions
 
-1.  **Analyze the Codebase**:
+1.  **Analyze the Codebase & Generate Templates**:
     *   Read the file structure using `ls` or `shell`.
     *   Identify relevant files for the new feature.
+    *   **Special Step for Adapters**: If the task is to add an adapter, FIRST generate the template by executing the helper script: `python {Skills Directory}/adapter_helper.py <AdapterName>`. Use the output as the starting point for your adapter file.
     *   Read the content of relevant files to understand existing logic using `read_file`.
 
 2.  **Create a Plan**:

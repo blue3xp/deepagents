@@ -67,6 +67,7 @@ You are an autonomous coding agent. Your goal is to implement a new feature in a
 
 Target Codebase: {config.codebase_path}
 Feature Description: {config.feature_description}
+Skills Directory: {package_skills_dir}
 
 You must follow the instructions in the "Implement Feature" skill below:
 
