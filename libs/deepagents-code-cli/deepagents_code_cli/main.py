@@ -38,6 +38,7 @@ async def run_autonomous_loop():
     # Ideally, we should use the SkillsMiddleware, but point it to our package's skills dir.
     # However, SkillsMiddleware takes a directory path.
     package_skills_dir = Path(__file__).parent / "skills"
+    package_knowledge_dir = Path(__file__).parent / "knowledge"
 
     # We need to set up the agent with this skills directory.
     # create_cli_agent doesn't expose skills_dir directly?
@@ -60,12 +61,23 @@ async def run_autonomous_loop():
     skill_path = package_skills_dir / "implement_adapter.md"
     skill_content = skill_path.read_text()
 
+    # Read Knowledge Base
+    knowledge_content = ""
+    if package_knowledge_dir.exists():
+        knowledge_files = sorted(package_knowledge_dir.glob("*.md"))
+        for kf in knowledge_files:
+            knowledge_content += f"\n\n### {kf.stem}\n{kf.read_text()}"
+
     # Construct the initial prompt
     prompt = f"""
 You are an autonomous coding agent specialized in implementing Adapter patterns.
 
 Target Codebase: {config.codebase_path}
 Skills Directory: {package_skills_dir}
+
+## Knowledge Base
+The following internal libraries are available. You MUST use them where appropriate:
+{knowledge_content}
 
 You must follow the instructions in the "Implement Adapter" skill below:
 

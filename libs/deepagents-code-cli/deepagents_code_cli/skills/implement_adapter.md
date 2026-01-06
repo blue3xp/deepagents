@@ -9,6 +9,7 @@ It follows a strict workflow: Analyze -> Plan -> Generate Template -> Implement 
 1.  **Analyze the Codebase**:
     *   Read the file structure using `ls` or `shell`.
     *   Identify the class that needs an adapter (the "Adaptee").
+    *   **Check Knowledge Base**: Before planning, review the "Knowledge Base" section in your system prompt. If there are private libraries (e.g., `private_net_lib`) that the adapter should utilize or interface with, note them down.
     *   Read the content of relevant files to understand existing logic using `read_file`.
 
 2.  **Generate Adapter Template**:
