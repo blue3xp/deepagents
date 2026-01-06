@@ -18,7 +18,6 @@ async def run_autonomous_loop():
         sys.exit(1)
 
     print(f"Codebase Path: {config.codebase_path}")
-    print(f"Feature Description: {config.feature_description}")
 
     # Create model
     model = create_model(config.model_name)
@@ -58,18 +57,17 @@ async def run_autonomous_loop():
     )
 
     # Read the skill content
-    skill_path = package_skills_dir / "implement_feature.md"
+    skill_path = package_skills_dir / "implement_adapter.md"
     skill_content = skill_path.read_text()
 
     # Construct the initial prompt
     prompt = f"""
-You are an autonomous coding agent. Your goal is to implement a new feature in an existing codebase.
+You are an autonomous coding agent specialized in implementing Adapter patterns.
 
 Target Codebase: {config.codebase_path}
-Feature Description: {config.feature_description}
 Skills Directory: {package_skills_dir}
 
-You must follow the instructions in the "Implement Feature" skill below:
+You must follow the instructions in the "Implement Adapter" skill below:
 
 ---
 {skill_content}

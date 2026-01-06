@@ -23,7 +23,6 @@ Create a `.env` file in your working directory (or set environment variables):
 
 ```env
 CODEBASE_PATH=/path/to/your/codebase
-FEATURE_DESCRIPTION="Description of the feature you want to implement."
 OPENAI_API_KEY=your_openai_api_key
 MODEL_NAME=gpt-4o (optional, defaults to gpt-4o)
 ```
@@ -34,7 +33,7 @@ MODEL_NAME=gpt-4o (optional, defaults to gpt-4o)
 deepagents-code-cli
 ```
 
-The agent will start working on the feature described in `.env`. It will analyze the code in `CODEBASE_PATH`, implement the feature, and verify it with tests.
+The agent will analyze the code in `CODEBASE_PATH` to identify where an Adapter pattern is needed. It will generate an adapter template using a helper script, implement the adapter, and verify it with tests.
 
 ## Development
 
