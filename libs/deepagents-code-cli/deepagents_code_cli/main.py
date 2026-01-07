@@ -19,6 +19,7 @@ from rich.markdown import Markdown
 
 from deepagents_code_cli.config import config
 from deepagents_code_cli.skills.middleware import SkillsMiddleware
+from deepagents_code_cli.agent_memory import AgentMemoryMiddleware
 
 console = Console()
 
@@ -76,13 +77,18 @@ def create_local_agent(model_name: str, system_prompt: str, assistant_id: str, s
         assistant_id=assistant_id
     )
 
+    # Agent Memory Middleware
+    memory_middleware = AgentMemoryMiddleware(
+        project_root=Path(config.codebase_path).resolve()
+    )
+
     # 5. Create Agent
     agent = create_deep_agent(
         model=model,
         tools=tools,
         system_prompt=system_prompt,
         backend=backend,
-        middleware=[skills_middleware],
+        middleware=[skills_middleware, memory_middleware],
         interrupt_on={},
         checkpointer=None,
     )
