@@ -7,7 +7,6 @@ license = { text = "MIT" }
 requires-python = ">=3.11,<4.0"
 dependencies = [
   "deepagents==0.2.8",
-  "deepagents-cli==0.0.12",
   "rich>=13.0.0",
   "prompt-toolkit>=3.0.52",
   "langchain-openai>=0.1.0",
@@ -40,4 +39,3 @@ deepagents_code_cli = ["skills/*.md", "skills/*.py", "knowledge/*.md"]
 
 [tool.uv.sources]
 deepagents = { path = "../deepagents" }
-deepagents-cli = { path = "../deepagents-cli" }

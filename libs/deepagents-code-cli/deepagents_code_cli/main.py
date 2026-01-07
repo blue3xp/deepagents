@@ -1,75 +1,135 @@
 import asyncio
 import sys
+import os
 from pathlib import Path
+from typing import Any
 
-from deepagents_cli.agent import create_cli_agent
-from deepagents_cli.config import SessionState, create_model
-from deepagents_cli.execution import execute_task
-from deepagents_cli.ui import TokenTracker
-from deepagents_cli.tools import fetch_url, http_request
+# DeepAgents Core Imports
+from deepagents.graph import create_deep_agent
+from deepagents.backends.composite import CompositeBackend
+from deepagents.backends.filesystem import FilesystemBackend
+from langchain_core.messages import HumanMessage, ToolMessage
+from langchain.chat_models import init_chat_model
+from langchain_openai import ChatOpenAI
+from rich.console import Console
+from rich.markdown import Markdown
 
 from deepagents_code_cli.config import config
+
+console = Console()
+
+def create_local_agent(model_name: str, system_prompt: str, assistant_id: str):
+    """
+    Create a deep agent configured for local execution.
+    Replaces deepagents_cli.agent.create_cli_agent
+    """
+
+    # 1. Initialize Model
+    # Using ChatOpenAI directly or init_chat_model
+    # deepagents uses init_chat_model internally if model is a string,
+    # but we can pass a configured model instance.
+    if "gpt" in model_name:
+         model = ChatOpenAI(model=model_name, api_key=config.openai_api_key)
+    else:
+         model = init_chat_model(model_name, model_provider="openai") # Fallback assuming openai compatible
+
+    # 2. Setup Backend (Filesystem)
+    # Using FilesystemBackend for local file access
+    fs_backend = FilesystemBackend()
+
+    # CompositeBackend is used by deepagents to route paths (e.g. sandboxes),
+    # but for purely local, we just wrap the filesystem backend.
+    backend = CompositeBackend(default=fs_backend, routes={})
+
+    # 3. Create Agent
+    # deepagents.graph.create_deep_agent sets up the graph and middleware
+    agent = create_deep_agent(
+        model=model,
+        tools=[], # deepagents adds default filesystem tools via middleware/graph if backend is provided
+        system_prompt=system_prompt,
+        backend=backend,
+        interrupt_on={}, # auto_approve=True equivalent (no interrupts)
+        checkpointer=None, # In-memory only for this CLI
+    )
+
+    return agent, backend
+
+async def execute_task(prompt: str, agent: Any, assistant_id: str):
+    """
+    Execute the agent loop.
+    Replaces deepagents_cli.execution.execute_task
+    """
+
+    console.print(f"[bold green]Starting Agent Task...[/bold green]")
+
+    stream_input = {"messages": [{"role": "user", "content": prompt}]}
+    config = {"configurable": {"thread_id": "1"}} # Simple thread ID
+
+    async for chunk in agent.astream(
+        stream_input,
+        stream_mode=["messages", "updates"],
+        subgraphs=True,
+        config=config,
+    ):
+        if not isinstance(chunk, tuple) or len(chunk) != 3:
+            continue
+
+        _namespace, current_stream_mode, data = chunk
+
+        if current_stream_mode == "messages":
+            message, _metadata = data
+
+            # Print Assistant text
+            if hasattr(message, "content") and message.content:
+                if not isinstance(message, ToolMessage) and not isinstance(message, HumanMessage):
+                     # Likely AIMessage
+                     # Handle content blocks if present (Anthropic/OpenAI) or just content string
+                     if isinstance(message.content, str) and message.content.strip():
+                         # Check if it's the final chunk of a message to avoid spamming partials
+                         # Ideally we buffer, but for simplicity let's just print full messages or chunks
+                         # Actually deepagents stream returns chunks.
+                         pass
+                         # For a cleaner CLI, implementing full streaming pretty print is complex.
+                         # We'll rely on the fact that we just want to see it's working.
+                         sys.stdout.write(message.content)
+                         sys.stdout.flush()
+
+        # Handle tool execution visualization (Updates)
+        elif current_stream_mode == "updates":
+            # In deepagents, updates often contain the tool calls or state changes
+            pass
+
+    console.print("\n[bold green]Task Completed.[/bold green]")
+
 
 async def run_autonomous_loop():
     try:
         config.validate()
     except ValueError as e:
-        print(f"Configuration Error: {e}")
+        console.print(f"[bold red]Configuration Error:[/bold red] {e}")
         sys.exit(1)
 
-    print(f"Codebase Path: {config.codebase_path}")
-    print(f"Reference Codebase Path: {config.reference_codebase_path}")
+    console.print(f"Codebase Path: {config.codebase_path}")
+    console.print(f"Reference Codebase Path: {config.reference_codebase_path}")
 
-    # Create model
-    model = create_model(config.model_name)
-
-    # Tools
-    tools = [http_request, fetch_url]
-    # We might need to add specific tools for this CLI if not included in default agent
-    # The default agent in deepagents-cli includes file ops and shell.
-
-    # Agent setup
-    assistant_id = "code-cli-agent"
-
-    # We need to make sure the agent has access to the skills.
-    # The standard CLI loads skills from ~/.deepagents/... or project root.
-    # We want to inject our 'implement_feature' skill.
-    # For now, we can rely on the prompt instructing the agent, or manually inject the skill content.
-
-    # Ideally, we should use the SkillsMiddleware, but point it to our package's skills dir.
-    # However, SkillsMiddleware takes a directory path.
+    # Skill and Knowledge Loading
     package_skills_dir = Path(__file__).parent / "skills"
     package_knowledge_dir = Path(__file__).parent / "knowledge"
 
-    # We need to set up the agent with this skills directory.
-    # create_cli_agent doesn't expose skills_dir directly?
-    # Let's check deepagents_cli.agent.create_cli_agent signature.
-
-    # It seems create_cli_agent uses settings.user_skills_dir.
-    # We might need to monkeypatch or subclass, or just copy the skill to a place where it's found.
-    # OR, better, we can construct the agent manually if create_cli_agent is too opinionated.
-
-    # Let's try to use create_cli_agent but update the system prompt or inject the skill.
-
-    agent, backend = create_cli_agent(
-        model=model,
-        assistant_id=assistant_id,
-        tools=tools,
-        auto_approve=True, # No user intervention
-    )
-
-    # Read the skill content
     skill_path = package_skills_dir / "implement_adapter.md"
+    if not skill_path.exists():
+         console.print(f"[bold red]Error:[/bold red] Skill file not found at {skill_path}")
+         sys.exit(1)
+
     skill_content = skill_path.read_text()
 
-    # Read Knowledge Base
     knowledge_content = ""
     if package_knowledge_dir.exists():
         knowledge_files = sorted(package_knowledge_dir.glob("*.md"))
         for kf in knowledge_files:
             knowledge_content += f"\n\n### {kf.stem}\n{kf.read_text()}"
 
-    # Construct the initial prompt
+    # Construct Prompt
     prompt = f"""
 You are an autonomous coding agent specialized in implementing Adapter patterns.
 
@@ -91,18 +151,12 @@ Execute the task completely. Run tests to verify. Correct any errors.
 Do not ask for user input. If you are stuck, try to solve it yourself or report the failure.
 """
 
-    session_state = SessionState(auto_approve=True)
-    token_tracker = TokenTracker()
+    # Create Agent
+    assistant_id = "code-cli-agent"
+    agent, backend = create_local_agent(config.model_name, "", assistant_id)
 
     # Execute
-    await execute_task(
-        prompt,
-        agent,
-        assistant_id,
-        session_state,
-        token_tracker,
-        backend=backend
-    )
+    await execute_task(prompt, agent, assistant_id)
 
 def main():
     asyncio.run(run_autonomous_loop())
