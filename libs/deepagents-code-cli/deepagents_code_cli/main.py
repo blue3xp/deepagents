@@ -136,14 +136,6 @@ async def run_autonomous_loop():
 
     # Directories
     package_skills_dir = Path(__file__).parent / "skills"
-    package_knowledge_dir = Path(__file__).parent / "knowledge"
-
-    # Knowledge Loading (Manual for now, SkillsMiddleware handles skills)
-    knowledge_content = ""
-    if package_knowledge_dir.exists():
-        knowledge_files = sorted(package_knowledge_dir.glob("*.md"))
-        for kf in knowledge_files:
-            knowledge_content += f"\n\n### {kf.stem}\n{kf.read_text()}"
 
     # Construct Prompt
     # Note: We do NOT inject skill content here anymore. SkillsMiddleware does it.
@@ -152,10 +144,6 @@ You are an autonomous coding agent specialized in implementing Adapter patterns.
 
 Target Codebase: {config.codebase_path}
 Reference Codebase: {config.reference_codebase_path}
-
-## Knowledge Base
-The following internal libraries are available. You MUST use them where appropriate:
-{knowledge_content}
 
 Your goal is to implement a new feature (likely an Adapter) in the existing codebase.
 Check your available skills to see if any apply to this task.
