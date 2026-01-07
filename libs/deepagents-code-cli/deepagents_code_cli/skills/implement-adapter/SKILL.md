@@ -1,10 +1,15 @@
-"""SKILL: Implement Adapter
+---
+name: implement-adapter
+description: Implement Adapter pattern by analyzing codebases, generating templates, and refactoring logic.
+---
 
-# Description
+# Skill: Implement Adapter
+
+## Description
 This skill specifically handles the creation of an Adapter pattern implementation for an existing class in the codebase.
 It follows a strict workflow: Analyze -> Plan -> Generate Template -> Implement -> Test -> Verify.
 
-# Instructions
+## Instructions
 
 1.  **Analyze and Identify Interfaces for Refactoring**:
     *   **Scan Target Codebase**: Scan `CODEBASE_PATH` (Target Codebase) to identify all defined interfaces or abstract base classes.
@@ -16,8 +21,9 @@ It follows a strict workflow: Analyze -> Plan -> Generate Template -> Implement 
 
 2.  **Generate Adapter Template**:
     *   Determine the name for the new Adapter class (e.g., if adapting `OldSystem`, name it `OldSystemAdapter`).
-    *   Execute the helper script to generate the boilerplate:
-        `python {Skills Directory}/adapter_helper.py <AdapterName>`
+    *   Execute the helper script located in this skill's directory to generate the boilerplate:
+        `python <path_to_this_skill_directory>/adapter_helper.py <AdapterName>`
+        *(Note: Replace `<path_to_this_skill_directory>` with the absolute path of the directory containing this SKILL.md file)*
     *   The output of this command is your starting point.
 
 3.  **Refactor & Implement Code**:
@@ -48,4 +54,3 @@ Use `ls`, `read_file`, `write_file`, `edit_file`, and `shell`.
 
 # Critical
 You must run tests to verify your changes. Do not assume it works.
-"""
